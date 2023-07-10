@@ -1,3 +1,6 @@
+Pip install
+ - ```!pip install 'exllama_lib @ git+https://github.com/nivibilla/exllama'```
+--------------------------------------------------------------------------------------------------------------
 # ExLlama
 
 A standalone Python/C++/CUDA implementation of Llama for use with 4-bit GPTQ weights, designed to be fast and
