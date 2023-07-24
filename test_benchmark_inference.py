@@ -34,13 +34,14 @@ def begin():
 def next_logits(input_ids, apply_lora, last_id_only = True, input_mask = None):
     global model, cache
 
-    n_logits = None
-    a = 0
-    while a < input_ids.shape[-1]:
-        b = min(input_ids.shape[-1], a + 2048)
-        n_logits = model.forward(input_ids[:, a:b], cache, last_id_only, lora = apply_lora, input_mask = input_mask)
-        a = b
+    # n_logits = None
+    # a = 0
+    # while a < input_ids.shape[-1]:
+    #     b = min(input_ids.shape[-1], a + 2048)
+    #     n_logits = model.forward(input_ids[:, a:b], cache, last_id_only, lora = apply_lora, input_mask = input_mask)
+    #     a = b
 
+    n_logits = model.forward(input_ids, cache, last_id_only, lora=apply_lora, input_mask=input_mask)
     return n_logits
 
 
@@ -128,6 +129,9 @@ model_init.print_stats(model)
 
 torch.cuda.reset_peak_memory_stats("cuda")
 mem("Model")
+
+cache = ExLlamaCache(model)
+mem("Cache")
 
 # Load LoRA
 
@@ -230,8 +234,10 @@ if args.validate:
 
     begin()
 
+    ppl.cache.zero()
     model.config.matmul_recons_thd = 1
     ppl.test(8, lora = lora, tag = " (reconstruct)")
+    ppl.cache.zero()
     model.config.matmul_recons_thd = 0
     ppl.test(8, lora = lora, tag = " (quant, token)", ppl_token = True)
 
